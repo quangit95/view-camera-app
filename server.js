@@ -286,6 +286,6 @@ app.get('/api/stream', (req, res) => {
     command.pipe(pt, { end: true });
 });
 
-app.listen(PORT, () => {
-    console.log(`View-Camera server is running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`View-Camera server is running on port ${PORT}`);
 });
