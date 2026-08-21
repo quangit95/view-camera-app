@@ -94,7 +94,7 @@ app.post('/api/test-connection', (req, res) => {
 
     console.log(`Testing connection to: ${rtspUrl}`);
 
-    ffmpeg.ffprobe(rtspUrl, (err, metadata) => {
+    ffmpeg.ffprobe(rtspUrl, ['-rtsp_transport', 'tcp', '-stimeout', '10000000'], (err, metadata) => {
         if (err) {
             console.error('Connection test failed:', err.message);
             // In a real scenario without an NVR this will fail.
