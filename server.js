@@ -4,13 +4,20 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
-const ffmpegPath = require('ffmpeg-static');
-const ffprobePath = require('ffprobe-static').path;
 const { request } = require('urllib');
 const xml2js = require('xml2js');
 
-ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath);
+// Only use static binaries if NOT on Railway (Railway provides native ffmpeg)
+if (!process.env.RAILWAY_ENVIRONMENT) {
+    try {
+        const ffmpegPath = require('ffmpeg-static');
+        const ffprobePath = require('ffprobe-static').path;
+        ffmpeg.setFfmpegPath(ffmpegPath);
+        ffmpeg.setFfprobePath(ffprobePath);
+    } catch (err) {
+        console.warn("Could not load static ffmpeg, falling back to system ffmpeg.");
+    }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;

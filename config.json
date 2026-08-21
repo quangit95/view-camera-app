@@ -1,6 +1,6 @@
 {
   "nvrType": "hikvision",
-  "nvrIp": "192.168.100.100",
+  "nvrIp": "villa662eanvien.dihotel.top",
   "httpPort": "80",
   "nvrPort": "554",
   "nvrUsername": "admin",
