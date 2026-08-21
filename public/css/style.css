@@ -1,0 +1,53 @@
+/* Custom styles for View-Camera */
+
+/* Glassmorphism panel */
+.glass-panel {
+    background: rgba(43, 45, 66, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Custom time input icon fix for webkit */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Base input overrides for mobile Safari */
+input, select, button {
+    -webkit-appearance: none;
+    font-family: inherit;
+}
+
+/* Smooth transitions */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* Hide scrollbar for video wrapper if needed */
+video::-webkit-media-controls-panel {
+    background-color: transparent !important;
+    background-image: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+    background: none !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+}

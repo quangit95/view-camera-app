@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View-Camera | Clip & Download</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        charcoal: '#1E1E24',
+                        slate: '#2B2D42',
+                        terracotta: '#E07A5F',
+                        amber: '#D97706',
+                        offwhite: '#F4F1DE'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Flatpickr for custom date/time formatting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<body class="bg-charcoal text-offwhite min-h-screen flex flex-col font-sans selection:bg-terracotta selection:text-white">
+
+    <header class="bg-slate shadow-md py-4 px-6 sticky top-0 z-50 border-b border-gray-700 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-video text-terracotta"></i> 
+                View-Camera
+            </h1>
+            <div class="text-sm text-gray-400 hidden sm:block">Highlights</div>
+        </div>
+        <button id="settings-btn" class="text-gray-400 hover:text-white transition-colors" title="Settings">
+            <i class="fa-solid fa-gear text-xl"></i>
+        </button>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-start p-4 sm:p-6 sm:py-10">
+        <div class="w-full max-w-3xl bg-slate rounded-2xl shadow-xl overflow-hidden glass-panel p-6 sm:p-8">
+            <h2 class="text-2xl font-semibold mb-6 text-center tracking-tight">Extract Clip</h2>
+            
+            <form id="extract-form" class="space-y-6">
+                
+                <!-- Camera Selection -->
+                <div class="space-y-2">
+                    <label for="channel" class="block text-sm font-medium text-gray-300">Select Court / Camera</label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-grow">
+                            <select id="channel" name="channel" required class="w-full appearance-none bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all cursor-pointer text-base">
+                                <option value="" disabled selected>Select an option...</option>
+                                <option value="1">Court 1 - Channel 01</option>
+                                <option value="2">Court 2 - Channel 02</option>
+                                <option value="3">Court 3 - Channel 03</option>
+                                <option value="4">Court 4 - Channel 04</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <button type="button" id="refresh-channels-btn" class="bg-charcoal border border-gray-600 hover:border-terracotta text-white rounded-xl px-4 flex items-center justify-center transition-colors shadow-sm" title="Refresh Camera List from NVR">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Time Range -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="startTime" class="block text-sm font-medium text-gray-300">Start Time</label>
+                        <input type="datetime-local" id="startTime" name="startTime" required class="w-full bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all text-base block">
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label for="endTime" class="block text-sm font-medium text-gray-300">End Time</label>
+                        <input type="datetime-local" id="endTime" name="endTime" required class="w-full bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-terracotta focus:border-transparent transition-all text-base block">
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <button type="button" class="preset-btn text-xs bg-charcoal border border-gray-600 hover:border-terracotta rounded-full px-4 py-2 transition-colors" data-minutes="2">Last 2 mins</button>
+                    <button type="button" class="preset-btn text-xs bg-charcoal border border-gray-600 hover:border-terracotta rounded-full px-4 py-2 transition-colors" data-minutes="5">Last 5 mins</button>
+                    <button type="button" class="preset-btn text-xs bg-charcoal border border-gray-600 hover:border-terracotta rounded-full px-4 py-2 transition-colors" data-minutes="10">Last 10 mins</button>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn" class="w-full bg-terracotta hover:bg-amber text-white font-semibold rounded-xl py-4 shadow-lg shadow-terracotta/20 transition-all active:scale-[0.98] flex justify-center items-center gap-2 mt-4 text-lg">
+                    <span>Extract Highlight</span>
+                    <i class="fa-solid fa-scissors"></i>
+                </button>
+            </form>
+            
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="hidden flex-col items-center justify-center py-10 space-y-4">
+                <div class="spinner border-t-terracotta border-4 border-gray-700 border-solid rounded-full w-12 h-12 animate-spin"></div>
+                <p class="text-gray-300 text-sm animate-pulse text-center">Processing video...<br><span class="text-xs text-gray-500">This may take a moment.</span></p>
+            </div>
+
+            <!-- Result Area -->
+            <div id="result-area" class="hidden mt-8 pt-8 border-t border-gray-700">
+                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-green-500"></i> Ready
+                </h3>
+                
+                <div class="bg-charcoal rounded-xl overflow-hidden shadow-inner mb-6 relative">
+                    <video id="video-preview" controls class="w-full aspect-video bg-black" preload="metadata">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                
+                <a id="download-btn" href="#" download class="w-full flex items-center justify-center gap-2 bg-charcoal border border-terracotta text-terracotta hover:bg-terracotta hover:text-white font-semibold rounded-xl py-4 transition-all active:scale-[0.98] text-lg">
+                    <i class="fa-solid fa-download"></i>
+                    <span>Save to Device</span>
+                </a>
+                
+                <p class="text-xs text-gray-500 text-center mt-4">Video is temporarily saved and will be deleted after 1 hour.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex-col items-center justify-center p-4">
+        <div class="bg-slate rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in border border-gray-700">
+            <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <h3 class="text-lg font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-terracotta"></i> NVR Setup
+                </h3>
+                <button id="close-settings-btn" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="settings-form" class="p-6 space-y-4">
+                <div class="space-y-2">
+                    <label for="nvrType" class="block text-sm font-medium text-gray-300">NVR Type</label>
+                    <select id="nvrType" name="nvrType" class="w-full appearance-none bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta">
+                        <option value="hikvision">Hikvision</option>
+                        <option value="dahua">Dahua</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="space-y-2 col-span-1">
+                        <label for="nvrIp" class="block text-sm font-medium text-gray-300">IP Address</label>
+                        <input type="text" id="nvrIp" name="nvrIp" placeholder="192.168.1.100" class="w-full bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta block">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="httpPort" class="block text-sm font-medium text-gray-300">HTTP Port</label>
+                        <input type="number" id="httpPort" name="httpPort" placeholder="80" class="w-full bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta block">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="nvrPort" class="block text-sm font-medium text-gray-300">RTSP Port</label>
+                        <input type="number" id="nvrPort" name="nvrPort" placeholder="554" class="w-full bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta block">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="nvrUsername" class="block text-sm font-medium text-gray-300">Username</label>
+                    <input type="text" id="nvrUsername" name="nvrUsername" placeholder="admin" class="w-full bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta block">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="nvrPassword" class="block text-sm font-medium text-gray-300">Password</label>
+                    <input type="password" id="nvrPassword" name="nvrPassword" class="w-full bg-charcoal border border-gray-600 text-offwhite rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta block">
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" id="test-connection-btn" class="flex-1 bg-charcoal border border-gray-600 hover:border-terracotta text-white font-semibold rounded-xl py-3 transition-all active:scale-[0.98] flex justify-center items-center gap-2">
+                        <span>Test Connection</span>
+                        <i id="test-spinner" class="fa-solid fa-spinner fa-spin hidden"></i>
+                    </button>
+                    <button type="submit" class="flex-1 bg-terracotta hover:bg-amber text-white font-semibold rounded-xl py-3 shadow-lg transition-all active:scale-[0.98]">
+                        Save Settings
+                    </button>
+                </div>
+                
+                <div id="settings-toast" class="hidden text-center text-sm mt-2 text-green-500 font-medium transition-all">
+                    Settings saved successfully!
+                </div>
+                
+                <div id="test-result-msg" class="hidden text-center text-sm mt-2 font-medium transition-all">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

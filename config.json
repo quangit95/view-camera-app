@@ -1,0 +1,8 @@
+{
+  "nvrType": "hikvision",
+  "nvrIp": "192.168.100.100",
+  "httpPort": "80",
+  "nvrPort": "554",
+  "nvrUsername": "admin",
+  "nvrPassword": "QATech999"
+}
