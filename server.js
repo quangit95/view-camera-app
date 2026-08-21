@@ -3,9 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const { execFile } = require('child_process');
 const ffmpeg = require('fluent-ffmpeg');
 const { request } = require('urllib');
 const xml2js = require('xml2js');
+
+let ffprobeCmd = 'ffprobe';
 
 // Only use static binaries if NOT on Railway (Railway provides native ffmpeg)
 if (!process.env.RAILWAY_ENVIRONMENT) {
@@ -14,6 +17,7 @@ if (!process.env.RAILWAY_ENVIRONMENT) {
         const ffprobePath = require('ffprobe-static').path;
         ffmpeg.setFfmpegPath(ffmpegPath);
         ffmpeg.setFfprobePath(ffprobePath);
+        ffprobeCmd = ffprobePath;
     } catch (err) {
         console.warn("Could not load static ffmpeg, falling back to system ffmpeg.");
     }
@@ -94,12 +98,12 @@ app.post('/api/test-connection', (req, res) => {
 
     console.log(`Testing connection to: ${rtspUrl}`);
 
-    ffmpeg.ffprobe(rtspUrl, ['-rtsp_transport', 'tcp', '-stimeout', '10000000'], (err, metadata) => {
-        if (err) {
-            console.error('Connection test failed:', err.message);
-            // In a real scenario without an NVR this will fail.
-            // For testing the UI behavior even if it fails we return the error.
-            return res.status(400).json({ success: false, error: 'Connection failed: ' + err.message });
+    // Use execFile to pass options correctly before the input URL
+    const args = ['-v', 'error', '-rtsp_transport', 'tcp', '-stimeout', '10000000', '-show_streams', rtspUrl];
+    execFile(ffprobeCmd, args, (error, stdout, stderr) => {
+        if (error) {
+            console.error('Connection test failed:', error.message, stderr);
+            return res.status(400).json({ success: false, error: 'Connection failed: ' + error.message });
         }
         
         console.log('Connection test successful.');
