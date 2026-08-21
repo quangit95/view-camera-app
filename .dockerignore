@@ -1,0 +1,8 @@
+node_modules
+.env
+public/downloads/*
+!public/downloads/.gitkeep
+test.mp4
+test_cmd.mp4
+test_cmd.ts
+.DS_Store
