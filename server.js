@@ -98,8 +98,7 @@ app.post('/api/test-connection', (req, res) => {
 
     console.log(`Testing connection to: ${rtspUrl}`);
 
-    // Use execFile to pass options correctly before the input URL
-    const args = ['-v', 'error', '-rtsp_transport', 'tcp', '-stimeout', '10000000', '-show_streams', '-i', rtspUrl];
+    const args = ['-v', 'error', '-show_streams', '-rtsp_transport', 'tcp', '-stimeout', '10000000', '-i', rtspUrl];
     execFile(ffprobeCmd, args, (error, stdout, stderr) => {
         if (error) {
             console.error('Connection test failed:', error.message, stderr);
